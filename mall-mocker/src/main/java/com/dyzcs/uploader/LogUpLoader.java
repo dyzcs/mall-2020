@@ -15,21 +15,21 @@ public class LogUpLoader {
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
-            //设置请求方式为post
+            // 设置请求方式为post
             conn.setRequestMethod("POST");
 
-            //时间头用来供server进行时钟校对的
+            // 时间头用来供server进行时钟校对的
             conn.setRequestProperty("clientTime", System.currentTimeMillis() + "");
 
-            //允许上传数据
+            // 允许上传数据
             conn.setDoOutput(true);
 
-            //设置请求的头信息,设置内容类型为JSON
+            // 设置请求的头信息,设置内容类型为JSON
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
             System.out.println("upload" + log);
 
-            //输出流
+            // 输出流
             OutputStream out = conn.getOutputStream();
             out.write(("logString=" + log).getBytes());
             out.flush();
