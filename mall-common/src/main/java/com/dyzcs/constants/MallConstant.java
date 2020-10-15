@@ -1,0 +1,13 @@
+package com.dyzcs.constants;
+
+/**
+ * Created by Administrator on 2020/10/15.
+ */
+public class MallConstant {
+
+    // 启动日志主题
+    public static final String MALL_STARTUP = "mall_startup";
+
+    // 事件日志主题
+    public static final String MALL_EVENT = "mall_event";
+}
