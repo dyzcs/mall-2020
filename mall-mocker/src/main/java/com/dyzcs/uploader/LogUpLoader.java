@@ -11,7 +11,7 @@ public class LogUpLoader {
     public static void sendLogStream(String log) {
         try {
             // 不同的日志类型对应不同的 URL
-            URL url = new URL("http://s183/log");
+            URL url = new URL("http://localhost:8080/log");
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
