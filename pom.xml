@@ -18,6 +18,7 @@
         <module>mall-common</module>
         <module>mall-mocker</module>
         <module>mall-logger</module>
+        <module>mall-realtime</module>
     </modules>
 
     <properties>
