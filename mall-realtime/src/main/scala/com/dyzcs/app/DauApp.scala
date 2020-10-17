@@ -54,6 +54,7 @@ object DauApp {
         val filterByMidGroupLogDStream:DStream[StartupLog] = DauHandler.filterByMidGroup(filterByRedisLogDStream)
 
         // 7.将mid写入Redis
+        DauHandler.saveMidToRedis(filterByMidGroupLogDStream)
 
         // 8.将数据整体写入Phoenix
 

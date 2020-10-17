@@ -9,6 +9,28 @@ import org.apache.spark.streaming.dstream.DStream
  */
 object DauHandler {
     /**
+     * 将两次过滤后的数据集中的Mid写入Redis
+     *
+     * @param filterByMidGroupLogDStream 两次过滤后的数据集
+     */
+    def saveMidToRedis(filterByMidGroupLogDStream: DStream[StartupLog]): DStream[StartupLog] = {
+        // 将数据转换为RDD进行操作
+        filterByMidGroupLogDStream.foreachRDD(rdd => {
+            // 对每个分区单独写库
+            rdd.foreachPartition(iter => {
+                // a.获取Redis连接
+                val jedisClient = RedisUtil.getJedisClient
+
+                // b.写库操作
+                iter.foreach(log => jedisClient.sadd(s"dau:${log.logDate}", log.mid))
+
+                // c.释放连接
+            })
+        })
+        filterByMidGroupLogDStream
+    }
+
+    /**
      * 对经过Redis去重之后的数据集，按照Mid分组进行去重
      *
      * @param filterByRedisLogDStream redis过滤后数据
