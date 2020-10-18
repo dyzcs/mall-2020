@@ -104,6 +104,24 @@ object DauHandler {
             rdd.filter(log => !uidBC.value.contains(log.mid))
         })
 
+        // 方案三: 按照每天的数据独立过滤
+        val dateToLogs: DStream[(String, Iterable[StartupLog])] =
+            startupLogDStream.map(log => (log.logDate, log)).groupByKey()
+
+        dateToLogs.transform(rdd => {
+            rdd.map { case (date, logs) =>
+                // 获取用户信息
+                // a.获取redis连接
+                val jedisClient = RedisUtil.getJedisClient
+                // b.查询用户信息
+                val uids = jedisClient.smembers(s"dau:$date")
+                // c.释放连接
+                jedisClient.close()
+
+                logs.filter(log => !uids.contains(log.mid))
+            }
+        })
+
         // 当前根据redis过滤方法的返回值
         filterByRedisLogDStream
     }
