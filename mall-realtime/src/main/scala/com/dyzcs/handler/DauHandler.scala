@@ -13,7 +13,7 @@ object DauHandler {
      *
      * @param filterByMidGroupLogDStream 两次过滤后的数据集
      */
-    def saveMidToRedis(filterByMidGroupLogDStream: DStream[StartupLog]): DStream[StartupLog] = {
+    def saveMidToRedis(filterByMidGroupLogDStream: DStream[StartupLog]): Unit = {
         // 将数据转换为RDD进行操作
         filterByMidGroupLogDStream.foreachRDD(rdd => {
             // 对每个分区单独写库
@@ -25,9 +25,9 @@ object DauHandler {
                 iter.foreach(log => jedisClient.sadd(s"dau:${log.logDate}", log.mid))
 
                 // c.释放连接
+                jedisClient.close()
             })
         })
-        filterByMidGroupLogDStream
     }
 
     /**

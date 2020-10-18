@@ -46,12 +46,15 @@ object DauApp {
             // 返回
             log
         })
+        startupLogDStream.cache()
 
         // 5.结合Redis跨批次进行去重
         val filterByRedisLogDStream:DStream[StartupLog] = DauHandler.filterByRedis(startupLogDStream)
+        filterByRedisLogDStream.cache()
 
         // 6.使用分组做同批次去重
         val filterByMidGroupLogDStream:DStream[StartupLog] = DauHandler.filterByMidGroup(filterByRedisLogDStream)
+        filterByMidGroupLogDStream.cache()
 
         // 7.将mid写入Redis
         DauHandler.saveMidToRedis(filterByMidGroupLogDStream)
@@ -59,7 +62,9 @@ object DauApp {
         // 8.将数据整体写入Phoenix
 
         // 测试打印
-        startupLogDStream.print()
+        startupLogDStream.count().print()
+        filterByRedisLogDStream.count().print()
+        filterByMidGroupLogDStream.count().print()
 
         // 启动
         ssc.start()
