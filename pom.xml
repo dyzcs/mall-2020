@@ -19,6 +19,7 @@
         <module>mall-mocker</module>
         <module>mall-logger</module>
         <module>mall-realtime</module>
+        <module>mall-publisher</module>
     </modules>
 
     <properties>
