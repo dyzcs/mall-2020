@@ -49,6 +49,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.phoenix</groupId>
+			<artifactId>phoenix-core</artifactId>
+			<version>5.0.0-HBase-2.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>29.0-jre</version>
+		</dependency>
 	</dependencies>
 
 	<build>
