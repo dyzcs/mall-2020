@@ -14,6 +14,6 @@
         where LOGDATE = #{date}
         group by LOGHOUR
     </select>
-    <resultMap id="dauTotalHour" type="java.util.Map" autoMapping="true">
-    </resultMap>
+
+    <resultMap id="dauTotalHour" type="java.util.Map" autoMapping="true"/>
 </mapper>
