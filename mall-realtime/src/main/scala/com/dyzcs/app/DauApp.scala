@@ -8,6 +8,7 @@ import com.dyzcs.bean.StartupLog
 import com.dyzcs.constants.MallConstant
 import com.dyzcs.handler.DauHandler
 import com.dyzcs.utils.MyKafkaUtil
+import org.apache.hadoop.conf.Configuration
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -46,11 +47,9 @@ object DauApp {
             // 返回
             log
         })
-        startupLogDStream.cache()
 
         // 5.结合Redis跨批次进行去重
         val filterByRedisLogDStream: DStream[StartupLog] = DauHandler.filterByRedis(startupLogDStream, ssc.sparkContext)
-        filterByRedisLogDStream.cache()
 
         // 6.使用分组做同批次去重
         val filterByMidGroupLogDStream: DStream[StartupLog] = DauHandler.filterByMidGroup(filterByRedisLogDStream)
@@ -59,12 +58,14 @@ object DauApp {
         // 7.将mid写入Redis
         DauHandler.saveMidToRedis(filterByMidGroupLogDStream)
 
-        // 8.将数据整体写入Phoenix
-
-        // 测试打印
-        startupLogDStream.count().print()
-        filterByRedisLogDStream.count().print()
-        filterByMidGroupLogDStream.count().print()
+        // 8.将数据明细写入Phoenix
+        filterByMidGroupLogDStream.foreachRDD(rdd => {
+            import org.apache.phoenix.spark._
+            rdd.saveToPhoenix("MALL_DAU",
+                Seq("MID", "UID", "APPID", "AREA", "OS", "CH", "TYPE", "VS", "LOGDATE", "LOGHOUR", "TS"),
+                new Configuration,
+                Some("s183:2181"))
+        })
 
         // 启动
         ssc.start()
