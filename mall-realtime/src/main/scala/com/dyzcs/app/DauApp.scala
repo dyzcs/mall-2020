@@ -49,11 +49,11 @@ object DauApp {
         startupLogDStream.cache()
 
         // 5.结合Redis跨批次进行去重
-        val filterByRedisLogDStream:DStream[StartupLog] = DauHandler.filterByRedis(startupLogDStream)
+        val filterByRedisLogDStream: DStream[StartupLog] = DauHandler.filterByRedis(startupLogDStream, ssc.sparkContext)
         filterByRedisLogDStream.cache()
 
         // 6.使用分组做同批次去重
-        val filterByMidGroupLogDStream:DStream[StartupLog] = DauHandler.filterByMidGroup(filterByRedisLogDStream)
+        val filterByMidGroupLogDStream: DStream[StartupLog] = DauHandler.filterByMidGroup(filterByRedisLogDStream)
         filterByMidGroupLogDStream.cache()
 
         // 7.将mid写入Redis

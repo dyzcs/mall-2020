@@ -1,19 +1,28 @@
 package com.dyzcs.handler
 
+import java.text.SimpleDateFormat
+import java.util
+import java.util.Date
+
 import com.dyzcs.bean.StartupLog
 import com.dyzcs.utils.RedisUtil
+import org.apache.spark.SparkContext
+import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.streaming.dstream.DStream
 
 /**
  * Created by Administrator on 2020/10/16.
  */
 object DauHandler {
+
+    private val sdf = new SimpleDateFormat("yyyy-MM-dd")
+
     /**
      * 将两次过滤后的数据集中的Mid写入Redis
      *
      * @param filterByMidGroupLogDStream 两次过滤后的数据集
      */
-    def saveMidToRedis  (filterByMidGroupLogDStream: DStream[StartupLog]): Unit = {
+    def saveMidToRedis(filterByMidGroupLogDStream: DStream[StartupLog]): Unit = {
         // 将数据转换为RDD进行操作
         filterByMidGroupLogDStream.foreachRDD(rdd => {
             // 对每个分区单独写库
@@ -59,23 +68,42 @@ object DauHandler {
      * @param startupLogDStream 原始数据集
      * @return 过滤后数据集
      */
-    def filterByRedis(startupLogDStream: DStream[StartupLog]): DStream[StartupLog] = {
-        // 将数据转换为RDD
+    def filterByRedis(startupLogDStream: DStream[StartupLog], sc: SparkContext): DStream[StartupLog] = {
+        //        // 方案一: 将数据转换为RDD
+        //        val filterByRedisLogDStream = startupLogDStream.transform(rdd => {
+        //            // 对RDD的每个分区单独处理，减少连接的创建
+        //            val filterRDD = rdd.mapPartitions(iter => {
+        //                // a.获取redis连接
+        //                val jedisClient = RedisUtil.getJedisClient
+        //                // b.过滤
+        //                val logs = iter.filter(log => !jedisClient.sismember(s"dau:${log.logDate}", log.mid))
+        //                // c.关闭
+        //                jedisClient.close()
+        //                // d.返回过滤后的数据
+        //                logs
+        //            })
+        //            // 返回过滤后的数据
+        //            filterRDD
+        //        })
+
+        // 方案二: 每个批次获取用户信息，广播至Executor
         val filterByRedisLogDStream = startupLogDStream.transform(rdd => {
-            // 对RDD的每个分区单独处理，减少连接的创建
-            val filterRDD = rdd.mapPartitions(iter => {
-                // a.获取redis连接
-                val jedisClient = RedisUtil.getJedisClient
-                // b.过滤
-                val logs = iter.filter(log => !jedisClient.sismember(s"dau:${log.logDate}", log.mid))
-                // c.关闭
-                jedisClient.close()
-                // d.返回过滤后的数据
-                logs
-            })
-            // 返回过滤后的数据
-            filterRDD
+            // Driver端，每个批次执行一次
+            // a.获取当前时间
+            val ts: Long = System.currentTimeMillis()
+            val date = sdf.format(new Date(ts))
+            // b.获取连接
+            val jedisClient = RedisUtil.getJedisClient
+            // c.查询用户信息
+            val uids = jedisClient.smembers(s"dau:$date")
+            val uidBC: Broadcast[util.Set[String]] = sc.broadcast(uids)
+            // d.释放连接
+            jedisClient.close()
+
+            // 过滤
+            rdd.filter(log => !uidBC.value.contains(log.mid))
         })
+
         // 当前根据redis过滤方法的返回值
         filterByRedisLogDStream
     }
