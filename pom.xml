@@ -20,6 +20,7 @@
         <module>mall-logger</module>
         <module>mall-realtime</module>
         <module>mall-publisher</module>
+        <module>mall-chart</module>
     </modules>
 
     <properties>
