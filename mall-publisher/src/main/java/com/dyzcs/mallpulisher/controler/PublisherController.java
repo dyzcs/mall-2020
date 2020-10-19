@@ -16,8 +16,6 @@ import java.util.Map;
 
 /**
  * Created by Administrator on 2020/10/18.
- * <p>
- * http://localhost:8070/realtime-total?date=2020-10-18
  */
 @RestController
 public class PublisherController {
@@ -26,6 +24,9 @@ public class PublisherController {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    /**
+     * http://localhost:8070/realtime-total?date=2020-10-18
+     */
     @RequestMapping("realtime-total")
     public String getRealTimeTotal(@RequestParam("date") String date) {
         // 查询Phoenix数据
@@ -53,6 +54,9 @@ public class PublisherController {
         return JSONObject.toJSONString(result);
     }
 
+    /**
+     * http://localhost:8070/realtime-hours?id=dau&date=2020-10-18
+     */
     @RequestMapping("realtime-hours")
     public String getDauTotalHourMap(@RequestParam("id") String id, @RequestParam("date") String date) {
         // 创建Map用于存放最终结果数据
