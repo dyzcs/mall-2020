@@ -14,8 +14,7 @@ public class PublisherServiceImpl implements PublisherService {
     private DauMapper dauMapper;
 
     @Override
-    public String getRealTimeTotal(String date) {
-        dauMapper.selectDauTotal(date);
-        return null;
+    public Integer getRealTimeTotal(String date) {
+        return dauMapper.selectDauTotal(date);
     }
 }
