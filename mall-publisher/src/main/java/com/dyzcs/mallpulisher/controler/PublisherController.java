@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2020/10/18.
@@ -52,6 +55,8 @@ public class PublisherController {
 
     @RequestMapping("realtime-hours")
     public String getDauTotalHourMap(@RequestParam("id") String id, @RequestParam("date") String date) {
+        // 创建Map用于存放最终结果数据
+        Map<String, Map> result = new HashMap<>();
 
         // 查询今天的日活数据
         Map todayDauTotal = publisherService.getDauTotalHourMap(date);
@@ -71,6 +76,11 @@ public class PublisherController {
         // 查询昨天的数据
         Map yesterdayDauTotal = publisherService.getDauTotalHourMap(yesterday);
 
-        return "";
+        // 将今天以及昨天的分时统计数据放入map集合
+        result.put("yesterday", yesterdayDauTotal);
+        result.put("today", todayDauTotal);
+
+        // 返回数据
+        return JSONObject.toJSONString(result);
     }
 }
