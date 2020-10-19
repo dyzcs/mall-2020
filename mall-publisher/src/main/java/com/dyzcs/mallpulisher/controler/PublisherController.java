@@ -7,19 +7,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by Administrator on 2020/10/18.
- *
+ * <p>
  * http://localhost:8070/realtime-total?date=2020-10-18
  */
 @RestController
 public class PublisherController {
     @Autowired
     private PublisherService publisherService;
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     @RequestMapping("realtime-total")
     public String getRealTimeTotal(@RequestParam("date") String date) {
@@ -46,5 +48,29 @@ public class PublisherController {
 
         // 返货结果
         return JSONObject.toJSONString(result);
+    }
+
+    @RequestMapping("realtime-hours")
+    public String getDauTotalHourMap(@RequestParam("id") String id, @RequestParam("date") String date) {
+
+        // 查询今天的日活数据
+        Map todayDauTotal = publisherService.getDauTotalHourMap(date);
+
+        // 获取昨天日期的字符串
+        Calendar calendar = Calendar.getInstance();
+        String yesterday = null;
+        try {
+            calendar.setTime(sdf.parse(date));
+            calendar.add(Calendar.DAY_OF_MONTH, -1);
+
+            yesterday = sdf.format(calendar.getTime());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 查询昨天的数据
+        Map yesterdayDauTotal = publisherService.getDauTotalHourMap(yesterday);
+
+        return "";
     }
 }
