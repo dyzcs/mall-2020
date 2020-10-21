@@ -15,3 +15,6 @@ mall 数据实时处理模块
 
 ## 5. mall-chart
 mall 数据可视化模块
+
+## 6. mall-canal
+mall MySQL 数据监控 - canal
