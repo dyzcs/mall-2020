@@ -10,4 +10,7 @@ public class MallConstant {
 
     // 事件日志主题
     public static final String MALL_EVENT = "mall_event";
+
+    // 订单数据主题
+    public static final String MALL_ORDER_INFO = "mall_order_info";
 }
