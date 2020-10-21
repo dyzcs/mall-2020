@@ -46,6 +46,8 @@ public class PublisherController {
         newMidMap.put("name", "新增设备");
         newMidMap.put("value", 233);
 
+        // 创建Map用于存放交易额数据
+
         // 将map数据放入集合
         result.add(dauMap);
         result.add(newMidMap);
