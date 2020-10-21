@@ -2,7 +2,7 @@ package com.dyzcs.utils
 
 import java.util.Properties
 
-import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig}
+import redis.clients.jedis.{Jedis, JedisPool, JedisPoolConfig, Protocol}
 
 /**
  * Created by Administrator on 2020/10/16.
@@ -16,6 +16,7 @@ object RedisUtil {
             val config: Properties = PropertiesUtil.load("config.properties")
             val host: String = config.getProperty("redis.host")
             val port: String = config.getProperty("redis.port")
+            val password: String = config.getProperty("redis.password")
 
             val jedisPoolConfig = new JedisPoolConfig()
             jedisPoolConfig.setMaxTotal(100) //最大连接数
@@ -25,7 +26,7 @@ object RedisUtil {
             jedisPoolConfig.setMaxWaitMillis(2000) //忙碌时等待时长 毫秒
             jedisPoolConfig.setTestOnBorrow(true) //每次获得连接的进行测试
 
-            jedisPool = new JedisPool(jedisPoolConfig, host, port.toInt)
+            jedisPool = new JedisPool(jedisPoolConfig, host, port.toInt, Protocol.DEFAULT_TIMEOUT, password)
         }
         println(s"jedisPool.getNumActive = ${jedisPool.getNumActive}")
         println("获得一个连接")
