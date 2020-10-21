@@ -155,7 +155,7 @@ public class JsonMocker {
                 jsonMocker.sendLog(eventLog);
             }
             try {
-                Thread.sleep(400);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
