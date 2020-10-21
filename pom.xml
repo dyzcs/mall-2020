@@ -21,6 +21,7 @@
         <module>mall-realtime</module>
         <module>mall-publisher</module>
         <module>mall-chart</module>
+        <module>mall-canal</module>
     </modules>
 
     <properties>
