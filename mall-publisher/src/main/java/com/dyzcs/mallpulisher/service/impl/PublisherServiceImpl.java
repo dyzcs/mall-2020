@@ -1,6 +1,7 @@
 package com.dyzcs.mallpulisher.service.impl;
 
 import com.dyzcs.mallpulisher.mapper.DauMapper;
+import com.dyzcs.mallpulisher.mapper.OrderMapper;
 import com.dyzcs.mallpulisher.service.PublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ import java.util.Map;
 public class PublisherServiceImpl implements PublisherService {
     @Autowired
     private DauMapper dauMapper;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public Integer getRealTimeTotal(String date) {
@@ -37,5 +41,20 @@ public class PublisherServiceImpl implements PublisherService {
 
         // 返回结果
         return resultMap;
+    }
+
+    @Override
+    public Double getOrderAmount(String date) {
+        return orderMapper.selectOrderAmountTotal(date);
+    }
+
+    @Override
+    public Map getOrderAmountHour(String date) {
+        List<Map> mapList = orderMapper.selectOrderAmountHourMap(date);
+        Map orderAmountHourMap = new HashMap<>();
+        for (Map map : mapList) {
+            orderAmountHourMap.put(map.get("CREATE_HOUR"), map.get("SUM_AMOUNT"));
+        }
+        return orderAmountHourMap;
     }
 }

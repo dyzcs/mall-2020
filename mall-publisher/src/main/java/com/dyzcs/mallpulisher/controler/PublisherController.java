@@ -31,6 +31,7 @@ public class PublisherController {
     public String getRealTimeTotal(@RequestParam("date") String date) {
         // 查询Phoenix数据
         Integer dauTotal = publisherService.getRealTimeTotal(date);
+        Double orderAmount = publisherService.getOrderAmount(date);
 
         // 创建集合用户存放结果Map
         ArrayList<Map<String, Object>> result = new ArrayList<>();
@@ -47,10 +48,15 @@ public class PublisherController {
         newMidMap.put("value", 233);
 
         // 创建Map用于存放交易额数据
+        Map<String, Object> orderMap = new HashMap<>();
+        orderMap.put("id", "order_amount");
+        orderMap.put("name", "新增交易额");
+        orderMap.put("value", orderAmount);
 
         // 将map数据放入集合
         result.add(dauMap);
         result.add(newMidMap);
+        result.add(orderMap);
 
         // 返货结果
         return JSONObject.toJSONString(result);
@@ -64,9 +70,32 @@ public class PublisherController {
         // 创建Map用于存放最终结果数据
         Map<String, Map> result = new HashMap<>();
 
-        // 查询今天的日活数据
-        Map todayDauTotal = publisherService.getDauTotalHourMap(date);
+        // 获取昨天的日期
+        String yesterday = getYesterdayString(date);
+        Map todayHour = null;
+        Map yesterdayHour = null;
 
+        if ("dau".equals(id)){
+            // 查询今天的日活数据
+            todayHour = publisherService.getDauTotalHourMap(date);
+            // 查询昨天的数据
+            yesterdayHour = publisherService.getDauTotalHourMap(yesterday);
+
+        } else if ("order_amount".equals(id)) {
+            todayHour = publisherService.getOrderAmountHour(date);
+            yesterdayHour = publisherService.getOrderAmountHour(yesterday);
+        }
+
+        // 将今天以及昨天的分时统计数据放入map集合
+        result.put("yesterday", yesterdayHour);
+        result.put("today", todayHour);
+
+        // 返回数据
+        return JSONObject.toJSONString(result);
+    }
+
+    // 获取昨天日期的方法
+    private String getYesterdayString(String date) {
         // 获取昨天日期的字符串
         Calendar calendar = Calendar.getInstance();
         String yesterday = null;
@@ -78,15 +107,6 @@ public class PublisherController {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
-        // 查询昨天的数据
-        Map yesterdayDauTotal = publisherService.getDauTotalHourMap(yesterday);
-
-        // 将今天以及昨天的分时统计数据放入map集合
-        result.put("yesterday", yesterdayDauTotal);
-        result.put("today", todayDauTotal);
-
-        // 返回数据
-        return JSONObject.toJSONString(result);
+        return yesterday;
     }
 }

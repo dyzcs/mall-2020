@@ -9,4 +9,8 @@ public interface PublisherService {
     Integer getRealTimeTotal(String date);
 
     Map getDauTotalHourMap(String date);
+
+    Double getOrderAmount(String date);
+
+    Map getOrderAmountHour(String date);
 }

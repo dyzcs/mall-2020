@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.dyzcs.mallpulisher.mapper.OrderMapper">
+    <select id="selectOrderAmountTotal" resultType="java.lang.Double">
+        select sum(total_amount) sum_amount
+        from mall_order_info
+        where create_date = #{date}
+    </select>
 
+    <select id="selectOrderAmountHourMap" resultMap="orderAmountHour">
+        select create_hour, cast(sum(total_amount) as double) sum_amount
+        from mall_order_info
+        where create_date = #{date}
+        group by create_hour
+    </select>
+
+    <resultMap id="orderAmountHour" type="java.util.Map" autoMapping="true"/>
 </mapper>
