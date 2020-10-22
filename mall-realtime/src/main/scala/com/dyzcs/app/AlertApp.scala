@@ -12,6 +12,8 @@ import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 
+import scala.util.control.Breaks._
+
 /**
  * Created by Administrator on 2020/10/22.
  */
@@ -62,21 +64,24 @@ object AlertApp {
             var noClick: Boolean = true
 
             // b.遍历迭代器
-            logIter.foreach(eventLog => {
-                // 提取事件类型
-                val evid = eventLog.evid
+            breakable {
+                logIter.foreach(eventLog => {
+                    // 提取事件类型
+                    val evid = eventLog.evid
 
-                // 向事件集合放入数据
-                events.add(evid)
+                    // 向事件集合放入数据
+                    events.add(evid)
 
-                // 判断是否为领劵行为
-                if ("coupon".equals(evid)) {
-                    uids.add(eventLog.uid)
-                    itemIds.add(eventLog.itemid)
-                } else if ("clickItem".equals(evid)) {
-                    noClick = false
-                }
-            })
+                    // 判断是否为领劵行为
+                    if ("coupon".equals(evid)) {
+                        uids.add(eventLog.uid)
+                        itemIds.add(eventLog.itemid)
+                    } else if ("clickItem".equals(evid)) {
+                        noClick = false
+                        break
+                    }
+                })
+            }
 
             (uids.size() >= 3 && noClick, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
         }
