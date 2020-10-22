@@ -7,7 +7,7 @@ import java.util.Date
 import com.alibaba.fastjson.JSON
 import com.dyzcs.bean.{CouponAlertInfo, EventLog}
 import com.dyzcs.constants.MallConstant
-import com.dyzcs.utils.MyKafkaUtil
+import com.dyzcs.utils.{MyEsUtil, MyKafkaUtil}
 import org.apache.spark.SparkConf
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.streaming.{Seconds, StreamingContext}
@@ -89,10 +89,29 @@ object AlertApp {
             }
 
         // 过滤出需要预警的日志信息
-        val result = boolToCouponAlertInfo.filter(_._1).map(_._2)
+        val result = boolToCouponAlertInfo
+                .filter(_._1)
+                .map { case (_, alertLog) =>
+                    // 获取时间戳
+                    val ts = alertLog.ts
+                    val min = ts / 1000 / 60
+
+                    // 返回结果
+                    (s"${alertLog.mid}_$min", alertLog)
+                }
+
+        result.print()
 
         // 8.写入ES
+//        result.foreachRDD(rdd => {
+//            // 按照分区写入
+//            rdd.foreachPartition(iter => {
+//                MyEsUtil.insertBulk(MallConstant.MALL_COUPON_ALERT, iter.toList)
+//            })
+//        })
 
         // 9.启动任务
+        ssc.start()
+        ssc.awaitTermination()
     }
 }

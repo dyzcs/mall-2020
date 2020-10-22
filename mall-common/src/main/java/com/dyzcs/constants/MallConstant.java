@@ -13,4 +13,7 @@ public class MallConstant {
 
     // 订单数据主题
     public static final String MALL_ORDER_INFO = "mall_order_info";
+
+    // 预警人日志ES索引
+    public static final String MALL_COUPON_ALERT = "mall_coupon_alert";
 }
