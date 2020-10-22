@@ -58,6 +58,9 @@ object AlertApp {
             val itemIds = new util.HashSet[String]()
             val events = new util.ArrayList[String]()
 
+            // 定义一个标签，用于判断是否有点击数据行为
+            var noClick: Boolean = true
+
             // b.遍历迭代器
             logIter.foreach(eventLog => {
                 // 提取事件类型
@@ -70,10 +73,12 @@ object AlertApp {
                 if ("coupon".equals(evid)) {
                     uids.add(eventLog.uid)
                     itemIds.add(eventLog.itemid)
+                } else if ("clickItem".equals(evid)) {
+                    noClick = false
                 }
             })
 
-            (uids.size() >= 3, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
+            (uids.size() >= 3 && noClick, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
         }
 
         // 8.写入ES
