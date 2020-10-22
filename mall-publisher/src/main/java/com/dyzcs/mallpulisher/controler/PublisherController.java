@@ -25,7 +25,7 @@ public class PublisherController {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
     /**
-     * http://localhost:8070/realtime-total?date=2020-10-18
+     * http://localhost:8070/realtime-total?date=2020-10-21
      */
     @RequestMapping("realtime-total")
     public String getRealTimeTotal(@RequestParam("date") String date) {
@@ -63,7 +63,9 @@ public class PublisherController {
     }
 
     /**
-     * http://localhost:8070/realtime-hours?id=dau&date=2020-10-18
+     * http://localhost:8070/realtime-hours?id=dau&date=2020-10-21
+     * <p>
+     * http://localhost:8070/realtime-hours?id=order_amount&date=2020-10-21
      */
     @RequestMapping("realtime-hours")
     public String getDauTotalHourMap(@RequestParam("id") String id, @RequestParam("date") String date) {
@@ -75,7 +77,7 @@ public class PublisherController {
         Map todayHour = null;
         Map yesterdayHour = null;
 
-        if ("dau".equals(id)){
+        if ("dau".equals(id)) {
             // 查询今天的日活数据
             todayHour = publisherService.getDauTotalHourMap(date);
             // 查询昨天的数据
