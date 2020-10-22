@@ -13,8 +13,11 @@ mall SpringBoot 日志服务器
 ## 4. mall-realtime
 mall 数据实时处理模块
 
-## 5. mall-chart
+## 5. mall-publisher
+mall 数据拉取模块
+
+## 6. mall-chart
 mall 数据可视化模块
 
-## 6. mall-canal
+## 7. mall-canal
 mall MySQL 数据监控 - canal
