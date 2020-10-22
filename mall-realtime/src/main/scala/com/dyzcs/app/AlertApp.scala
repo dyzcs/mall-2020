@@ -84,11 +84,12 @@ object AlertApp {
                     })
                 }
 
+                // c.返回结果
                 (uids.size() >= 3 && noClick, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
             }
 
         // 过滤出需要预警的日志信息
-        boolToCouponAlertInfo.filter(_._1).map(_._2)
+        val result = boolToCouponAlertInfo.filter(_._1).map(_._2)
 
         // 8.写入ES
 
