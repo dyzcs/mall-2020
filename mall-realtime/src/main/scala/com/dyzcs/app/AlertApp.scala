@@ -54,37 +54,41 @@ object AlertApp {
             eventLogWindowDStream.map(log => (log.mid, log)).groupByKey()
 
         // 7.根据登陆用户个数以及操作行为进行筛选
-        midToLogIterDStream.map { case (mid, logIter) =>
-            // a.存放三个集合用于存放结果数据
-            val uids = new util.HashSet[String]()
-            val itemIds = new util.HashSet[String]()
-            val events = new util.ArrayList[String]()
+        val boolToCouponAlertInfo: DStream[(Boolean, CouponAlertInfo)] =
+            midToLogIterDStream.map { case (mid, logIter) =>
+                // a.存放三个集合用于存放结果数据
+                val uids = new util.HashSet[String]()
+                val itemIds = new util.HashSet[String]()
+                val events = new util.ArrayList[String]()
 
-            // 定义一个标签，用于判断是否有点击数据行为
-            var noClick: Boolean = true
+                // 定义一个标签，用于判断是否有点击数据行为
+                var noClick: Boolean = true
 
-            // b.遍历迭代器
-            breakable {
-                logIter.foreach(eventLog => {
-                    // 提取事件类型
-                    val evid = eventLog.evid
+                // b.遍历迭代器
+                breakable {
+                    logIter.foreach(eventLog => {
+                        // 提取事件类型
+                        val evid = eventLog.evid
 
-                    // 向事件集合放入数据
-                    events.add(evid)
+                        // 向事件集合放入数据
+                        events.add(evid)
 
-                    // 判断是否为领劵行为
-                    if ("coupon".equals(evid)) {
-                        uids.add(eventLog.uid)
-                        itemIds.add(eventLog.itemid)
-                    } else if ("clickItem".equals(evid)) {
-                        noClick = false
-                        break
-                    }
-                })
+                        // 判断是否为领劵行为
+                        if ("coupon".equals(evid)) {
+                            uids.add(eventLog.uid)
+                            itemIds.add(eventLog.itemid)
+                        } else if ("clickItem".equals(evid)) {
+                            noClick = false
+                            break
+                        }
+                    })
+                }
+
+                (uids.size() >= 3 && noClick, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
             }
 
-            (uids.size() >= 3 && noClick, CouponAlertInfo(mid, uids, itemIds, events, System.currentTimeMillis()))
-        }
+        // 过滤出需要预警的日志信息
+        boolToCouponAlertInfo.filter(_._1).map(_._2)
 
         // 8.写入ES
 
