@@ -31,11 +31,13 @@
             <artifactId>spark-streaming-kafka-0-10_2.12</artifactId>
         </dependency>
 
+        <!-- redis -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.3.0</version>
         </dependency>
+
         <!-- elasticSearch  -->
         <dependency>
             <groupId>io.searchbox</groupId>

@@ -38,7 +38,10 @@ object AlertApp {
 
             // b.处理日期和时间
             val dateHourStr = sdf.format(new Date(eventLog.ts))
-            val dateHourArr = dateHourStr.split(" ")
+//            println(dateHourStr)
+            val dateHourArr = dateHourStr.split("-")
+//            println(dateHourArr(0))
+//            println(dateHourArr(1))
             eventLog.logDate = dateHourArr(0)
             eventLog.logHour = dateHourArr(1)
 
@@ -100,15 +103,15 @@ object AlertApp {
                     (s"${alertLog.mid}_$min", alertLog)
                 }
 
-        result.print()
+//        result.print()
 
         // 8.写入ES
-//        result.foreachRDD(rdd => {
-//            // 按照分区写入
-//            rdd.foreachPartition(iter => {
-//                MyEsUtil.insertBulk(MallConstant.MALL_COUPON_ALERT, iter.toList)
-//            })
-//        })
+        result.foreachRDD(rdd => {
+            // 按照分区写入
+            rdd.foreachPartition(iter => {
+                MyEsUtil.insertBulk(MallConstant.MALL_COUPON_ALERT, iter.toList)
+            })
+        })
 
         // 9.启动任务
         ssc.start()

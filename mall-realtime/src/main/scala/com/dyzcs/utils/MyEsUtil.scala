@@ -2,17 +2,17 @@ package com.dyzcs.utils
 
 import java.util
 import java.util.Objects
-
 import io.searchbox.client.{JestClient, JestClientFactory}
 import io.searchbox.client.config.HttpClientConfig
 import io.searchbox.core.{Bulk, BulkResult, Index}
+
 import collection.JavaConversions._
 
 /**
  * Created by Administrator on 2020/10/22.
  */
 object MyEsUtil {
-    private val ES_HOST = "http://s183"
+    private val ES_HOST = "http://127.0.0.1"
     private val ES_HTTP_PORT = 9200
     private var factory: JestClientFactory = _
 
@@ -55,7 +55,7 @@ object MyEsUtil {
             //获取ES客户端
             val jest: JestClient = getClient
             //创建Bulk.Builder对象
-//            val bulkBuilder: Bulk.Builder = new Bulk.Builder().defaultIndex(indexName).defaultType("_doc")
+            //            val bulkBuilder: Bulk.Builder = new Bulk.Builder().defaultIndex(indexName).defaultType("_doc")
             val bulkBuilder: Bulk.Builder = new Bulk.Builder().defaultIndex(indexName)
 
             //遍历集合,向Bulk.Builder对象中添加数据
