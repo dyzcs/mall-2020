@@ -66,25 +66,32 @@ public class CanalClient {
 
     // 处理监控的mysql数据，解析并发送至Kafka
     private static void handler(String tableName, List<CanalEntry.RowData> rowDatasList, CanalEntry.EventType eventType) {
-        // 判断是否为订单表
-        if ("order_info".equals(tableName)) {
-            // 取下单数据，即只要新增的数据
-            if (CanalEntry.EventType.INSERT.equals(eventType)) {
-                // 遍历rowDatasList
-                for (CanalEntry.RowData rowData : rowDatasList) {
-                    // 创建JSON对象，存放多个列对象
-                    JSONObject jsonObject = new JSONObject();
+        // 判断是否为订单表 && 取下单数据，即只要新增的数据
+        if ("order_info".equals(tableName) && CanalEntry.EventType.INSERT.equals(eventType)) {
+            sendToKafka(rowDatasList, MallConstant.MALL_ORDER_INFO);
+        } else if ("order_detail".equals(tableName) && CanalEntry.EventType.INSERT.equals(eventType)) {
+            sendToKafka(rowDatasList, MallConstant.MALL_ORDER_DETAIL);
+        } else if ("user_info".equals(tableName) &&
+                (CanalEntry.EventType.INSERT.equals(eventType) || CanalEntry.EventType.UPDATE.equals(eventType))) {
+            sendToKafka(rowDatasList, MallConstant.MALL_USER_INFO);
+        }
+    }
 
-                    // 遍历修改后的数据列
-                    for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
-                        jsonObject.put(column.getName(), column.getValue());
-                    }
-
-                    // 打印当前行的数据，写入kafka
-                    System.out.println(jsonObject.toJSONString());
-                    MyKafkaSender.send(MallConstant.MALL_ORDER_INFO, jsonObject.toString());
-                }
+    /**
+     * 将数据发送至kafka
+     */
+    private static void sendToKafka(List<CanalEntry.RowData> rowDatasList, String topic) {
+        // 遍历rowDatasList
+        for (CanalEntry.RowData rowData : rowDatasList) {
+            // 创建JSON对象，存放多个列对象
+            JSONObject jsonObject = new JSONObject();
+            // 遍历修改后的数据列
+            for (CanalEntry.Column column : rowData.getAfterColumnsList()) {
+                jsonObject.put(column.getName(), column.getValue());
             }
+            // 打印当前行的数据，写入kafka
+            System.out.println(jsonObject.toJSONString());
+            MyKafkaSender.send(topic, jsonObject.toString());
         }
     }
 }
