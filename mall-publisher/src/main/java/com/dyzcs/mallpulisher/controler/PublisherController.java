@@ -1,6 +1,8 @@
 package com.dyzcs.mallpulisher.controler;
 
 import com.alibaba.fastjson.JSONObject;
+import com.dyzcs.mallpulisher.bean.Option;
+import com.dyzcs.mallpulisher.bean.Stat;
 import com.dyzcs.mallpulisher.service.PublisherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,10 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Administrator on 2020/10/18.
@@ -93,6 +92,77 @@ public class PublisherController {
         result.put("today", todayHour);
 
         // 返回数据
+        return JSONObject.toJSONString(result);
+    }
+
+    @RequestMapping("sale_detail")
+    public String getSaleDetail(@RequestParam("date") String date, @RequestParam("startpage") Integer startpage, @RequestParam("size") Integer size, @RequestParam("keyword") String keyword) {
+        // 获取ES中的数据
+        Map saleDetailMap = publisherService.getSaleDetail(date, startpage, size, keyword);
+
+        // 创建HashMap存放结果数据
+        HashMap<String, Object> result = new HashMap<>();
+
+        // 获取数据中的总数以及明细
+        Long total = (Long) saleDetailMap.get("total");
+        List detail = (List) saleDetailMap.get("detail");
+
+        // 获取年龄信息
+        Map ageMap = (Map) saleDetailMap.get("ageMap");
+
+        Long lower20 = 0L;
+        Long start20to30 = 0L;
+
+        // 遍历ageMap，将年龄进行分组处理
+        for (Object o : ageMap.keySet()) {
+            Integer age = (Integer) o;
+            Long count = (Long) ageMap.get(o);
+            if (age < 20) {
+                lower20 += count;
+            } else if (age < 30) {
+                start20to30 += count;
+            }
+        }
+
+        double lower20Ratio = Math.round(lower20 * 1000 / total) / 10D;
+        double start20to30Ratio = Math.round(start20to30 * 1000 / total) / 10D;
+        double up30Ratio = 100D - lower20Ratio - start20to30Ratio;
+
+        Option lower20Opt = new Option("20岁以下", lower20Ratio);
+        Option start20to30Opt = new Option("20岁到30岁", start20to30Ratio);
+        Option up30Opt = new Option("30岁以上", up30Ratio);
+
+        ArrayList<Option> ageList = new ArrayList<>();
+        ageList.add(lower20Opt);
+        ageList.add(start20to30Opt);
+        ageList.add(up30Opt);
+
+        Stat ageStat = new Stat(ageList, "用户年龄占比");
+
+        // 获取性别信息
+        Map genderMap = (Map) saleDetailMap.get("genderMap");
+        Long femaleCount = (Long) genderMap.get("F");
+        double femaleRatio = Math.round(femaleCount * 1000 / total) / 10D;
+        double maleRatio = 100D - femaleRatio;
+
+        Option maleOpt = new Option("男", maleRatio);
+        Option femaleOpt = new Option("女", femaleRatio);
+
+        ArrayList<Option> genderList = new ArrayList<>();
+        genderList.add(maleOpt);
+        genderList.add(femaleOpt);
+
+        Stat genderStat = new Stat(genderList, "用户性别占比");
+
+        ArrayList<Stat> stats = new ArrayList<>();
+        stats.add(ageStat);
+        stats.add(genderStat);
+
+        // 存放数据
+        result.put("total", total);
+        result.put("stat", stats);
+        result.put("detail", detail);
+
         return JSONObject.toJSONString(result);
     }
 
