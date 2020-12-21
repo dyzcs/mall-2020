@@ -47,6 +47,8 @@ object DauApp {
             // 返回
             log
         })
+        // 测试
+//        startupLogDStream.print()
 
         // 5.结合Redis跨批次进行去重
         val filterByRedisLogDStream: DStream[StartupLog] = DauHandler.filterByRedis(startupLogDStream, ssc.sparkContext)
@@ -64,7 +66,7 @@ object DauApp {
             rdd.saveToPhoenix("MALL_DAU",
                 Seq("MID", "UID", "APPID", "AREA", "OS", "CH", "TYPE", "VS", "LOGDATE", "LOGHOUR", "TS"),
                 new Configuration,
-                Some("s183:2181"))
+                Some("s183,s184:2181"))
         })
 
         // 启动

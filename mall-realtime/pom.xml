@@ -64,5 +64,12 @@
             <groupId>org.apache.spark</groupId>
             <artifactId>spark-sql_2.12</artifactId>
         </dependency>
+
+        <!-- json to scala class -->
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-native_2.12</artifactId>
+            <version>3.6.10</version>
+        </dependency>
     </dependencies>
 </project>

@@ -25,7 +25,7 @@
     </modules>
 
     <properties>
-        <spark.version>3.0.0</spark.version>
+        <spark.version>3.0.1</spark.version>
         <scala.version>2.12.12</scala.version>
         <log4j.version>2.13.3</log4j.version>
         <slf4j.version>1.7.30</slf4j.version>

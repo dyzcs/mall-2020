@@ -63,9 +63,9 @@ public class PublisherController {
     }
 
     /**
-     * http://localhost:8070/realtime-hours?id=dau&date=2020-10-21
+     * http://localhost:8070/realtime-hours?id=dau&date=2020-12-20
      * <p>
-     * http://localhost:8070/realtime-hours?id=order_amount&date=2020-10-21
+     * http://localhost:8070/realtime-hours?id=order_amount&date=2020-12-20
      */
     @RequestMapping("realtime-hours")
     public String getDauTotalHourMap(@RequestParam("id") String id, @RequestParam("date") String date) {
