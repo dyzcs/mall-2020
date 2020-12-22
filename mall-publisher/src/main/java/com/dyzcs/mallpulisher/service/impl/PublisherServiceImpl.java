@@ -4,6 +4,8 @@ import com.dyzcs.constants.MallConstant;
 import com.dyzcs.mallpulisher.mapper.DauMapper;
 import com.dyzcs.mallpulisher.mapper.OrderMapper;
 import com.dyzcs.mallpulisher.service.PublisherService;
+import com.dyzcs.mallpulisher.util.MyESUtil;
+import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
@@ -36,8 +38,9 @@ public class PublisherServiceImpl implements PublisherService {
     @Autowired
     private OrderMapper orderMapper;
 
-    @Autowired
-    private JestClient jestClient;
+    //    @Autowired
+    private JestClient jestClient = MyESUtil.getJestCline();
+
 
     @Override
     public Integer getRealTimeTotal(String date) {
@@ -87,12 +90,12 @@ public class PublisherServiceImpl implements PublisherService {
 
         // 1.1.1 添加事件过滤条件，全值匹配
         boolQueryBuilder.filter(new TermQueryBuilder("dt", date));
-        searchSourceBuilder.query(boolQueryBuilder);
 
         // 1.1.2 添加商品名称过滤条件，分词匹配
         MatchQueryBuilder sku_name = new MatchQueryBuilder("sku_name", keyword);
         sku_name.operator(Operator.AND);
         boolQueryBuilder.must(sku_name);
+        searchSourceBuilder.query(boolQueryBuilder);
 
         // 1.2 添加聚合组
         // 1.2.1 添加年龄聚合组
@@ -113,6 +116,8 @@ public class PublisherServiceImpl implements PublisherService {
         SearchResult result = null;
         try {
             result = jestClient.execute(search);
+//            System.out.println(result);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,7 +125,8 @@ public class PublisherServiceImpl implements PublisherService {
         // 3.解析返回数据
         assert result != null;
         // 3.1 获取总数
-        Long total = result.getTotal();
+        JsonObject jsonObject = result.getJsonObject();
+        Object total = ((JsonObject) ((JsonObject) jsonObject.get("hits")).get("total")).get("value");
 
         // 3.2 获取数据明细
         List<SearchResult.Hit<Map, Void>> hits = result.getHits(Map.class);

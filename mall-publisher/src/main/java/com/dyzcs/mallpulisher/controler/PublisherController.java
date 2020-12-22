@@ -95,6 +95,7 @@ public class PublisherController {
         return JSONObject.toJSONString(result);
     }
 
+    // http://localhost:8070/sale_detail?date=2020-12-21&startpage=1&size=5&keyword=小米手机
     @RequestMapping("sale_detail")
     public String getSaleDetail(@RequestParam("date") String date, @RequestParam("startpage") Integer startpage, @RequestParam("size") Integer size, @RequestParam("keyword") String keyword) {
         // 获取ES中的数据
@@ -104,7 +105,7 @@ public class PublisherController {
         HashMap<String, Object> result = new HashMap<>();
 
         // 获取数据中的总数以及明细
-        Long total = (Long) saleDetailMap.get("total");
+        Long total = Long.parseLong(saleDetailMap.get("total").toString());
         List detail = (List) saleDetailMap.get("detail");
 
         // 获取年龄信息
@@ -115,7 +116,7 @@ public class PublisherController {
 
         // 遍历ageMap，将年龄进行分组处理
         for (Object o : ageMap.keySet()) {
-            Integer age = (Integer) o;
+            Integer age = Integer.parseInt((String) o);
             Long count = (Long) ageMap.get(o);
             if (age < 20) {
                 lower20 += count;
