@@ -14,7 +14,7 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping(value = "/")
-@PropertySource({"classpath:config/config.properties"})
+@PropertySource({"classpath:config/config-dev.properties"})
 public class IndexController {
 
     @Value("${my.totalUrl}")
