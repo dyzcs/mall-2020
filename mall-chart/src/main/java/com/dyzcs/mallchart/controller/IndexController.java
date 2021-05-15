@@ -71,8 +71,8 @@ public class IndexController {
         //System.out.println(tag);
 //        String s = "{'yesterday':{'00':110,'01':110,'02':25,'03':40,'07':87,'08':65,'09':32,'10':45,'11':35,'12':87,'13':34,'14':78,'15':54,'16':110,'17':100,'18':100,'19':56,'20':89,'21':88,'22':87,'23':86},'today':{'00':122,'01':122,'02':110,'03':105,'04':100,'05':46,'06':24,'07':24,'08':123,'09':221,'10':222,'11':100,'12':100,'13':78,'14':87,'15':67,'16':44,'17':77,'18':120,'19':100,'20':100,'21':108,'22':80,'23':55}}";
         String sysDate = GetDate.getSysDate();
-        System.out.println(hourUrl + "?id=" + tag + "&&date=" + sysDate);
-        return HttpClientUtil.doGet(hourUrl + "?id=" + tag + "&&date=" + sysDate);
+        System.out.println(hourUrl + "?id=" + tag + "&date=" + sysDate);
+        return HttpClientUtil.doGet(hourUrl + "?id=" + tag + "&date=" + sysDate);
 //        return s;
     }
 
